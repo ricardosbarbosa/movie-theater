@@ -17,9 +17,7 @@ function Movies() {
 
   const handleInputSearch = e => {
     const query = e.target.value
-    
     setQuery(query)
-
     if (query.trim().length === 0) {
       setVoteAverage(5)
     }
@@ -29,17 +27,27 @@ function Movies() {
     if (value === 0) setVoteAverage(5)
     else if (value !== voteAverage ) setVoteAverage(value)
   }
+  
+  const handleMovieClick = (movieId) => history.push(`/movies/${movieId}`)
 
   const filterMovieByRate = movie => {
     if (voteAverage === 0)
       return false
     const max = voteAverage * 2
-    return movie.vote_average <= max
+    const min = voteAverage * 2 - 2
+    return movie.vote_average > min && movie.vote_average <= max
   }
-  const ratedMovies = searchedMovies.filter(filterMovieByRate)
 
-  const handleMovieClick = (movieId) => history.push(`/movies/${movieId}`)
+  const sortMoviesByPopularity = (firstMovie, secondMovie) => {
+    return firstMovie.popularity - secondMovie.popularity
+  }
+  
+  const ratedMovies = searchedMovies
+    .filter(filterMovieByRate)
+    .sort(sortMoviesByPopularity)
 
+  const discoveredMoviesSortedByPopularity = discoveredMovies
+    .sort(sortMoviesByPopularity)
   const queryIsEmpty = query.trim().length === 0
   const notFoundSearchedMovies = searchedMovies.length === 0
 
@@ -55,11 +63,19 @@ function Movies() {
         <Content className="site-layout-background">
           <Content className="site-layout-background">
             {/* discovered movies when query is empty */}
-            {queryIsEmpty && (<ListOfMovies movies={discoveredMovies} onMovieClick={handleMovieClick}/>)}
+            {queryIsEmpty && (
+              <ListOfMovies
+                movies={discoveredMoviesSortedByPopularity}
+                onMovieClick={handleMovieClick}
+              />
+            )}
             
             {/* searched movies when the user is searching */}
             {!queryIsEmpty && !notFoundSearchedMovies && (
-              <ListOfMovies movies={ratedMovies} onMovieClick={handleMovieClick} />
+              <ListOfMovies
+                movies={ratedMovies}
+                onMovieClick={handleMovieClick}
+              />
             )}
             
             {/* Empty when there is no movie to show */}

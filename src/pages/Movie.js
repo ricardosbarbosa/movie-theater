@@ -1,4 +1,4 @@
-import { Descriptions, Image, Layout, PageHeader, Rate } from 'antd';
+import { Descriptions, Image, Layout, PageHeader, Rate, Tooltip } from 'antd';
 import useMovie from '../hooks/useMovie';
 import { useHistory, useParams } from 'react-router';
 
@@ -6,6 +6,7 @@ const { Content } = Layout;
 
 function Movie() {
   const { id } = useParams()
+  
   const history = useHistory()
   const movie = useMovie(id)
 
@@ -15,7 +16,11 @@ function Movie() {
       <PageHeader
         onBack={() => history.goBack()}
         title={movie.title}
-        subTitle={<Rate defaultValue={movie.vote_average} disabled/>}
+        subTitle={
+          <Tooltip title={movie.vote_average}>
+            <Rate defaultValue={movie.vote_average / 2} disabled allowHalf/>
+          </Tooltip>
+        }
       >
         <Descriptions column={4}>
           <Descriptions.Item label="Adulte">{movie.adult ? 'Yes' : 'No'}</Descriptions.Item>

@@ -3,43 +3,57 @@ import { useState } from 'react';
 import { useHistory } from 'react-router';
 import { ListOfMovies } from '../components/ListOfMovies';
 import useMovies from '../hooks/useMovies';
+import useQuery from '../hooks/useQuery';
 import useSearchMovies from '../hooks/useSearchMovies';
 
 const { Content } = Layout;
 
 function Movies() {
-  const [query, setQuery] = useState('')
-  const [voteAverage, setVoteAverage] = useState(5)
+  const urlQueryParams = useQuery()
+  
+  const query = urlQueryParams.get('query') || ''
+  
+  const [voteAverage, setVoteAverage] = useState(0)
   const history = useHistory()
 
   const discoveredMovies = useMovies()
-  const searchedMovies = useSearchMovies(query)
-
-  const handleInputSearch = e => {
-    const query = e.target.value
-    setQuery(query)
-    if (query.trim().length === 0) {
-      setVoteAverage(5)
-    }
-  }
+  const searchedMovies = useSearchMovies(urlQueryParams.get('query'))
 
   const handleRateChange = value => {
-    if (value === 0) setVoteAverage(5)
+    if (value === voteAverage) setVoteAverage(0)
     else if (value !== voteAverage ) setVoteAverage(value)
   }
   
-  const handleMovieClick = (movieId) => history.push(`/movies/${movieId}`)
+  const onSearchChange = (e) => {
+    if (e.target.value === '') {
+      history.push()
+    }
+  }
+  const onSearch = (value) => {
+    console.log({value})
+    history.push({
+      search: `?query=${value}`
+    })
+  }
+
+  const handleMovieClick = (movieId) => history.push({
+    pathname: `/movies/${movieId}`,
+    search: `?query=${query}`
+  })
 
   const filterMovieByRate = movie => {
-    if (voteAverage === 0)
-      return false
+    if (voteAverage === 0) {
+      return true
+    }
+      
     const max = voteAverage * 2
     const min = voteAverage * 2 - 2
-    return movie.vote_average > min && movie.vote_average <= max
+
+    return (movie.vote_average) > min && (movie.vote_average) <= max
   }
 
   const sortMoviesByPopularity = (firstMovie, secondMovie) => {
-    return firstMovie.popularity - secondMovie.popularity
+    return secondMovie.popularity - firstMovie.popularity
   }
   
   const ratedMovies = searchedMovies
@@ -56,10 +70,18 @@ function Movies() {
       <Content className="site-layout" >
         
         <Content className='banner'>
-          <Input.Search value={query} onChange={handleInputSearch} allowClear />
-          <Rate value={voteAverage} onChange={handleRateChange} />
+          <Input.Search
+            defaultValue={query}
+            onChange={onSearchChange}
+            onSearch={onSearch}
+            allowClear
+          />
+          <Rate
+            value={voteAverage}
+            onChange={handleRateChange}
+            disabled={!query}
+          />
         </Content>
-
         <Content className="site-layout-background">
           <Content className="site-layout-background">
             {/* discovered movies when query is empty */}

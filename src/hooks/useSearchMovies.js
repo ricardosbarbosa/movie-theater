@@ -5,7 +5,7 @@ export default function useSearchMovies(query) {
   const { data } = useQuery(
     ['search-movies', query],
     () => search({ query }),
-    { enabled: query.trim().length > 0 }
+    { enabled: !!query }
   )
   return data?.data.results || []
 }

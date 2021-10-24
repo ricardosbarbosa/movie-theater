@@ -1,5 +1,5 @@
 # Deployed App on Netlify
-https://rockstart-coders-movie-theater.netlify.app/movies
+https://rockstart-coders-movie-theater.netlify.app
 
 <img width="1636" alt="Screen Shot 2021-10-23 at 21 15 03" src="https://user-images.githubusercontent.com/1226982/138575124-3928c22d-be84-4487-8209-3c4ec3ca23e6.png">
 
